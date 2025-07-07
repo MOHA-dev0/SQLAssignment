@@ -1,0 +1,829 @@
+-- craete Tables
+CREATE TABLE [dbo].[Users](
+	[UserId] [int] NOT NULL,
+	[UserName] [varchar](64) NOT NULL,
+	[FirstName] [varchar](64) NOT NULL,
+	[LastName] [varchar](64) NOT NULL,
+	[EmailAddress] [varchar](128) NOT NULL,
+	[PhoneNumber] [varchar](16) NOT NULL,
+	[Role] [varchar](32) NOT NULL,
+ CONSTRAINT [PK_Users] PRIMARY KEY CLUSTERED 
+(
+	[UserId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
+ CONSTRAINT [IX_Users] UNIQUE NONCLUSTERED 
+(
+	[EmailAddress] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+CREATE TABLE [dbo].[Courses](
+	[CourseId] [int] NOT NULL,
+	[CourseName] [varchar](100) NOT NULL,
+	[TeacherId] [int] NULL,
+	[StartDate] [datetime] NOT NULL,
+	[EndDate] [datetime] NOT NULL,
+	[SyllabusId] [int] NULL,
+ CONSTRAINT [PK_Courses] PRIMARY KEY CLUSTERED 
+(
+	[CourseId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+ALTER TABLE [dbo].[Courses]  WITH CHECK ADD  CONSTRAINT [FK_Courses_Syllabus] FOREIGN KEY([SyllabusId])
+REFERENCES [dbo].[Syllabus] ([SyllabusId])
+GO
+
+ALTER TABLE [dbo].[Courses] CHECK CONSTRAINT [FK_Courses_Syllabus]
+GO
+
+ALTER TABLE [dbo].[Courses]  WITH CHECK ADD  CONSTRAINT [FK_Courses_Users] FOREIGN KEY([TeacherId])
+REFERENCES [dbo].[Users] ([UserId])
+GO
+
+ALTER TABLE [dbo].[Courses] CHECK CONSTRAINT [FK_Courses_Users]
+
+GO
+
+
+CREATE TABLE [dbo].[Assignments](
+	[AssignmentId] [int] NOT NULL,
+	[CourseId] [int] NOT NULL,
+	[AssignmentTitle] [varchar](128) NOT NULL,
+	[Description] [text] NULL,
+	[Weight] [float] NOT NULL,
+	[MaxGrade] [int] NOT NULL,
+	[DueDate] [date] NOT NULL,
+ CONSTRAINT [PK_Assignments] PRIMARY KEY CLUSTERED 
+(
+	[AssignmentId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+
+ALTER TABLE [dbo].[Assignments]  WITH CHECK ADD  CONSTRAINT [FK_Assignments_Courses] FOREIGN KEY([CourseId])
+REFERENCES [dbo].[Courses] ([CourseId])
+GO
+
+ALTER TABLE [dbo].[Assignments] CHECK CONSTRAINT [FK_Assignments_Courses]
+GO
+
+
+CREATE TABLE [dbo].[Comments](
+	[CommentId] [int] NOT NULL,
+	[AssignmentId] [int] NOT NULL,
+	[CreatedByUserId] [int] NOT NULL,
+	[CreatedDate] [datetime] NOT NULL,
+	[CommentContent] [text] NULL,
+ CONSTRAINT [PK_Comments] PRIMARY KEY CLUSTERED 
+(
+	[CommentId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+
+ALTER TABLE [dbo].[Comments]  WITH CHECK ADD  CONSTRAINT [FK_Comments_Assignments] FOREIGN KEY([AssignmentId])
+REFERENCES [dbo].[Assignments] ([AssignmentId])
+GO
+
+ALTER TABLE [dbo].[Comments] CHECK CONSTRAINT [FK_Comments_Assignments]
+GO
+
+ALTER TABLE [dbo].[Comments]  WITH CHECK ADD  CONSTRAINT [FK_Comments_Users] FOREIGN KEY([CreatedByUserId])
+REFERENCES [dbo].[Users] ([UserId])
+GO
+
+ALTER TABLE [dbo].[Comments] CHECK CONSTRAINT [FK_Comments_Users]
+GO
+
+
+
+CREATE TABLE [dbo].[Grades](
+	[GradeId] [int] NOT NULL,
+	[AssignmentId] [int] NOT NULL,
+	[StudentId] [int] NULL,
+	[Grade] [int] NULL,
+ CONSTRAINT [PK_Grades] PRIMARY KEY CLUSTERED 
+(
+	[GradeId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+ALTER TABLE [dbo].[Grades]  WITH CHECK ADD  CONSTRAINT [FK_Grades_Assignments] FOREIGN KEY([AssignmentId])
+REFERENCES [dbo].[Assignments] ([AssignmentId])
+GO
+
+ALTER TABLE [dbo].[Grades] CHECK CONSTRAINT [FK_Grades_Assignments]
+GO
+
+ALTER TABLE [dbo].[Grades]  WITH CHECK ADD  CONSTRAINT [FK_Grades_Users1] FOREIGN KEY([StudentId])
+REFERENCES [dbo].[Users] ([UserId])
+GO
+
+ALTER TABLE [dbo].[Grades] CHECK CONSTRAINT [FK_Grades_Users1]
+GO
+
+
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[Syllabus](
+	[SyllabusId] [int] NOT NULL,
+	[Description] [text] NULL,
+ CONSTRAINT [PK_Syllabus] PRIMARY KEY CLUSTERED 
+(
+	[SyllabusId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+
+--END Create Tables
+
+
+
+
+ -- Write SQL statements to INSERT data for all the interns into the user table with Role ‘Student’ 
+ -- Write SQL statements to INSERT data for Sami, Feryal into the user table with Role ‘Teacher’
+
+INSERT INTO [dbo].[Users]
+           ([UserId],[UserName]
+           ,[FirstName]
+           ,[LastName]
+           ,[EmailAddress]
+           ,[PhoneNumber]
+           ,[Role])
+     VALUES
+(1,'AbdelhakeHamdaoui', 'Abdelhake', 'Hamdaoui', 'abdelhakehamdaoui@test.com', '5378527466' ,'Student'),
+(2,'HouzifaHabbo', 'Houzifa', 'Habbo', 'houzifahabbo@test.com', '5325527466' ,'Student'),
+(3,'AyaKhalifa', 'Aya', 'Khalifa', 'ayakhalifa@test.com', '5300000001', 'Student'),
+(4,'FarahSilk', 'Farah', 'Silk', 'farahsilk@test.com', '5300000002', 'Student'),
+(5,'FeryalTulaimat', 'Feryal', 'Tulaimat', 'feryaltulaimat@test.com', '5300000003', 'Teacher'),
+(6,'MasaSoudan', 'Masa', 'Soudan', 'masasoudan@test.com', '5300000007', 'Student'),
+(7,'MohammadRamez', 'Mohammad', 'Ramez', 'mohammadramez@test.com', '5300000008', 'Student'),
+(8,'MosaMosa', 'Mosa', 'Mosa', 'mosamosa@test.com', '5300000009', 'Student'),
+(9,'NouhadElHallab', 'Nouhad', 'El Hallab', 'nouhadelhallab@test.com', '5300000010', 'Student'),
+(10,'SamiHijazi', 'Sami', 'Hijazi', 'samihijazi@test.com', '5300000011', 'Teacher'),
+(11,'ShamJamous', 'Sham', 'Jamous', 'shamjamous@test.com', '5300000012', 'Student'),
+(12,'YasinYildiz', 'Yasin', 'Yildiz', 'yasinyildiz@test.com', '5300000013', 'Student'),
+(13,'ZaidAlmoughrabl', 'Zaid', 'Almoughrabl', 'zaidalmoughrabl@test.com', '5300000014', 'Student'),
+(14,'ZomorodahBakhit', 'Zomorodah', 'Bakhit', 'zomorodahbakhit@test.com', '5300000015', 'Student')
+
+
+
+GO 
+
+ --Write SQL Statement to INSERT Syllabus for each Course.
+
+INSERT INTO Syllabus (SyllabusId, Description) VALUES
+(5001, 'SQL basics, queries, joins, and transactions.'),
+(5002, 'C# fundamentals, OOP, and LINQ.'),
+(5003, 'Entity Framework Core, migrations, and data seeding.'),
+(5004, 'Building RESTful APIs using Web API, authentication, and authorization.'),
+(5005, 'React components, hooks, state management, and routing.');
+
+GO
+
+
+-- Write SQL statements to INSERT data for SQL, C#, Entity Framework, Web API and React Courses.
+
+INSERT INTO Courses (CourseId, CourseName, TeacherId, StartDate, EndDate, SyllabusId)
+VALUES 
+(1, 'SQL Course', 5, '2025-09-01 09:00:00', '2025-12-15 17:00:00', 5001),
+(2, 'C# Course', 5, '2025-09-05 10:00:00', '2025-12-20 16:00:00', 5002),
+(3, 'Entity Framework Course', 10, '2025-10-01 08:30:00', '2026-01-30 15:00:00', 5003),
+(4, 'Web API Course', 10, '2025-11-01 11:00:00', '2026-02-28 14:30:00', NULL),
+(5, 'React Course', 10, '2025-09-10 13:00:00', '2026-01-10 18:00:00', 5005);
+go
+
+
+-- Write SQL Statements to INSERT at least 5 Assignments for each Course with random due dates (past & future).
+
+INSERT INTO Assignments (AssignmentId, CourseId, AssignmentTitle, Description, Weight, MaxGrade, DueDate)
+VALUES
+
+(1, 1, 'SQL Basics HW', 'Basic SELECT queries', 10.0, 100, '2024-05-10'), 
+(2, 1, 'Joins Project', 'Practice INNER and OUTER joins', 15.0, 100, '2025-09-15'), 
+(3, 1, 'Transactions Task', 'Write transaction-safe code', 20.0, 100, '2024-11-01'), 
+(4, 1, 'SQL Optimization', 'Analyze query performance', 25.0, 100, '2025-12-10'), 
+(5, 1, 'Final SQL Challenge', 'Combine all skills', 30.0, 100, '2024-06-20'),
+
+
+(6, 2, 'C# Syntax Quiz', 'Variables and control flow', 10.0, 100, '2025-10-05'), 
+(7, 2, 'OOP Assignment', 'Classes and inheritance', 20.0, 100, '2024-03-15'), 
+(8, 2, 'LINQ Tasks', 'Data manipulation with LINQ', 15.0, 100, '2025-12-01'), 
+(9, 2, 'Past C# Test', 'Old test review', 10.0, 100, '2024-04-10'), 
+(10, 2, 'Final C# Project', 'Complete app development', 45.0, 100, '2025-11-20'), 
+
+
+(11, 3, 'EF Basics', 'Create models and DB context', 15.0, 100, '2024-02-05'), 
+(12, 3, 'Migrations Exercise', 'Add and apply migrations', 20.0, 100, '2025-10-25'), 
+(13, 3, 'Seeding Data', 'Populate sample data', 10.0, 100, '2024-08-15'), 
+(14, 3, 'Old EF Task', 'Outdated feature test', 5.0, 100, '2025-12-30'), 
+(15, 3, 'Final EF App', 'Complete DB-driven app', 50.0, 100, '2024-07-01'),
+
+
+(16, 4, 'API Basics', 'Create basic API', 10.0, 100, '2025-11-15'), 
+(17, 4, 'Auth Project', 'Implement JWT auth', 20.0, 100, '2024-03-10'), 
+(18, 4, 'Swagger Docs', 'Document your API', 10.0, 100, '2025-10-01'),
+(19, 4, 'Past API HW', 'Old API task', 5.0, 100, '2024-05-25'), 
+(20, 4, 'Final API Project', 'Complete API with all features', 55.0, 100, '2025-12-05'), 
+
+
+(21, 5, 'React Basics', 'Create functional components', 10.0, 100, '2024-09-01'), 
+(22, 5, 'Hooks Exercise', 'UseState and UseEffect', 15.0, 100, '2025-10-15'),
+(23, 5, 'Routing Task', 'Implement React Router', 10.0, 100, '2024-06-10'), 
+(24, 5, 'Old React Project', 'Outdated UI', 5.0, 100, '2025-11-10'),
+(25, 5, 'Final React App', 'Full app with API integration', 60.0, 100, '2024-07-20'); 
+
+Go
+
+
+ --Write SQL Statements to INSERT at least 10 comments for random assignments.
+
+INSERT INTO Comments (CommentId, AssignmentId, CreatedByUserId, CreatedDate, CommentContent)
+VALUES
+(1, 1, 1, '2025-06-01 10:30:00', 'Great start on the SQL basics.'),
+(2, 2, 3, '2025-06-05 14:15:00', 'Joins look good, maybe optimize further.'),
+(3, 3, 4, '2025-05-20 09:00:00', 'Transaction handling is correct.'),
+(4, 6, 6, '2025-06-10 11:45:00', 'C# syntax clean, consider naming conventions.'),
+(5, 7, 7, '2025-04-25 08:30:00', 'OOP concepts well applied.'),
+(6, 11, 8, '2025-06-12 16:00:00', 'Entity Framework model looks solid.'),
+(7, 16, 9, '2025-06-18 13:20:00', 'API endpoints are functional, add more tests.'),
+(8, 17, 11, '2025-06-02 15:50:00', 'JWT auth implemented correctly.'),
+(9, 21, 12, '2025-05-28 17:10:00', 'React components are clean.'),
+(10, 22, 14, '2025-06-08 12:00:00', 'Hooks used properly, maybe add more comments.');
+
+GO
+
+--Write SQL Statement to INSERT random grades for all students for every assignment.
+
+
+INSERT INTO Grades (GradeId, AssignmentId, StudentId, Grade) VALUES
+(1, 1, 1, 85),
+(2, 1, 2, 90),
+(3, 1, 3, 78),
+(4, 1, 4, 88),
+(5, 1, 6, 92),
+(6, 1, 7, 80),
+(7, 1, 8, 84),
+(8, 1, 9, 79),
+(9, 1, 11, 91),
+(10, 1, 12, 77),
+(11, 1, 13, 86),
+(12, 1, 14, 89),
+
+(13, 2, 1, 90),
+(14, 2, 2, 87),
+(15, 2, 3, 85),
+(16, 2, 4, 83),
+(17, 2, 6, 88),
+(18, 2, 7, 92),
+(19, 2, 8, 90),
+(20, 2, 9, 86),
+(21, 2, 11, 89),
+(22, 2, 12, 84),
+(23, 2, 13, 81),
+(24, 2, 14, 88),
+
+(25, 3, 1, 80),
+(26, 3, 2, 82),
+(27, 3, 3, 85),
+(28, 3, 4, 88),
+(29, 3, 6, 90),
+(30, 3, 7, 87),
+(31, 3, 8, 84),
+(32, 3, 9, 85),
+(33, 3, 11, 83),
+(34, 3, 12, 89),
+(35, 3, 13, 90),
+(36, 3, 14, 92),
+
+(37, 4, 1, 75),
+(38, 4, 2, 78),
+(39, 4, 3, 80),
+(40, 4, 4, 82),
+(41, 4, 6, 85),
+(42, 4, 7, 88),
+(43, 4, 8, 87),
+(44, 4, 9, 83),
+(45, 4, 11, 90),
+(46, 4, 12, 84),
+(47, 4, 13, 81),
+(48, 4, 14, 86),
+
+(49, 5, 1, 88),
+(50, 5, 2, 89),
+(51, 5, 3, 90),
+(52, 5, 4, 87),
+(53, 5, 6, 85),
+(54, 5, 7, 82),
+(55, 5, 8, 84),
+(56, 5, 9, 83),
+(57, 5, 11, 90),
+(58, 5, 12, 92),
+(59, 5, 13, 91),
+(60, 5, 14, 88),
+
+(61, 6, 1, 78),
+(62, 6, 2, 82),
+(63, 6, 3, 84),
+(64, 6, 4, 79),
+(65, 6, 6, 80),
+(66, 6, 7, 85),
+(67, 6, 8, 88),
+(68, 6, 9, 87),
+(69, 6, 11, 83),
+(70, 6, 12, 85),
+(71, 6, 13, 89),
+(72, 6, 14, 90),
+
+(73, 7, 1, 85),
+(74, 7, 2, 87),
+(75, 7, 3, 89),
+(76, 7, 4, 83),
+(77, 7, 6, 80),
+(78, 7, 7, 84),
+(79, 7, 8, 88),
+(80, 7, 9, 90),
+(81, 7, 11, 91),
+(82, 7, 12, 87),
+(83, 7, 13, 85),
+(84, 7, 14, 88),
+
+(85, 8, 1, 78),
+(86, 8, 2, 80),
+(87, 8, 3, 83),
+(88, 8, 4, 85),
+(89, 8, 6, 87),
+(90, 8, 7, 89),
+(91, 8, 8, 84),
+(92, 8, 9, 82),
+(93, 8, 11, 88),
+(94, 8, 12, 85),
+(95, 8, 13, 90),
+(96, 8, 14, 91),
+
+(97, 9, 1, 85),
+(98, 9, 2, 83),
+(99, 9, 3, 81),
+(100, 9, 4, 79),
+(101, 9, 6, 80),
+(102, 9, 7, 84),
+(103, 9, 8, 86),
+(104, 9, 9, 88),
+(105, 9, 11, 90),
+(106, 9, 12, 91),
+(107, 9, 13, 87),
+(108, 9, 14, 85),
+
+(109, 10, 1, 88),
+(110, 10, 2, 89),
+(111, 10, 3, 87),
+(112, 10, 4, 85),
+(113, 10, 6, 82),
+(114, 10, 7, 84),
+(115, 10, 8, 86),
+(116, 10, 9, 88),
+(117, 10, 11, 90),
+(118, 10, 12, 91),
+(119, 10, 13, 92),
+(120, 10, 14, 89),
+
+(121, 11, 1, 83),
+(122, 11, 2, 85),
+(123, 11, 3, 87),
+(124, 11, 4, 88),
+(125, 11, 6, 89),
+(126, 11, 7, 90),
+(127, 11, 8, 85),
+(128, 11, 9, 84),
+(129, 11, 11, 82),
+(130, 11, 12, 83),
+(131, 11, 13, 88),
+(132, 11, 14, 90),
+
+(133, 12, 1, 90),
+(134, 12, 2, 88),
+(135, 12, 3, 87),
+(136, 12, 4, 85),
+(137, 12, 6, 84),
+(138, 12, 7, 83),
+(139, 12, 8, 82),
+(140, 12, 9, 80),
+(141, 12, 11, 79),
+(142, 12, 12, 81),
+(143, 12, 13, 83),
+(144, 12, 14, 85),
+
+(145, 13, 1, 85),
+(146, 13, 2, 87),
+(147, 13, 3, 88),
+(148, 13, 4, 90),
+(149, 13, 6, 92),
+(150, 13, 7, 93),
+(151, 13, 8, 89),
+(152, 13, 9, 88),
+(153, 13, 11, 87),
+(154, 13, 12, 85),
+(155, 13, 13, 84),
+(156, 13, 14, 86),
+
+(157, 14, 1, 80),
+(158, 14, 2, 82),
+(159, 14, 3, 85),
+(160, 14, 4, 87),
+(161, 14, 6, 88),
+(162, 14, 7, 90),
+(163, 14, 8, 91),
+(164, 14, 9, 89),
+(165, 14, 11, 87),
+(166, 14, 12, 85),
+(167, 14, 13, 84),
+(168, 14, 14, 83),
+
+(169, 15, 1, 90),
+(170, 15, 2, 92),
+(171, 15, 3, 94),
+(172, 15, 4, 91),
+(173, 15, 6, 89),
+(174, 15, 7, 88),
+(175, 15, 8, 87),
+(176, 15, 9, 85),
+(177, 15, 11, 84),
+(178, 15, 12, 83),
+(179, 15, 13, 82),
+(180, 15, 14, 81),
+
+(181, 16, 1, 88),
+(182, 16, 2, 87),
+(183, 16, 3, 86),
+(184, 16, 4, 85),
+(185, 16, 6, 84),
+(186, 16, 7, 83),
+(187, 16, 8, 82),
+(188, 16, 9, 81),
+(189, 16, 11, 80),
+(190, 16, 12, 79),
+(191, 16, 13, 78),
+(192, 16, 14, 77),
+
+(193, 17, 1, 85),
+(194, 17, 2, 87),
+(195, 17, 3, 89),
+(196, 17, 4, 90),
+(197, 17, 6, 92),
+(198, 17, 7, 91),
+(199, 17, 8, 89),
+(200, 17, 9, 87),
+(201, 17, 11, 85),
+(202, 17, 12, 84),
+(203, 17, 13, 83),
+(204, 17, 14, 82),
+
+(205, 18, 1, 80),
+(206, 18, 2, 82),
+(207, 18, 3, 84),
+(208, 18, 4, 86),
+(209, 18, 6, 88),
+(210, 18, 7, 90),
+(211, 18, 8, 89),
+(212, 18, 9, 87),
+(213, 18, 11, 85),
+(214, 18, 12, 83),
+(215, 18, 13, 82),
+(216, 18, 14, 81),
+
+(217, 19, 1, 88),
+(218, 19, 2, 87),
+(219, 19, 3, 86),
+(220, 19, 4, 85),
+(221, 19, 6, 84),
+(222, 19, 7, 83),
+(223, 19, 8, 82),
+(224, 19, 9, 81),
+(225, 19, 11, 80),
+(226, 19, 12, 79),
+(227, 19, 13, 78),
+(228, 19, 14, 77),
+
+(229, 20, 1, 85),
+(230, 20, 2, 87),
+(231, 20, 3, 88),
+(232, 20, 4, 89),
+(233, 20, 6, 90),
+(234, 20, 7, 91),
+(235, 20, 8, 92),
+(236, 20, 9, 93),
+(237, 20, 11, 94),
+(238, 20, 12, 95),
+(239, 20, 13, 96),
+(240, 20, 14, 97),
+
+(241, 21, 1, 90),
+(242, 21, 2, 89),
+(243, 21, 3, 88),
+(244, 21, 4, 87),
+(245, 21, 6, 86),
+(246, 21, 7, 85),
+(247, 21, 8, 84),
+(248, 21, 9, 83),
+(249, 21, 11, 82),
+(250, 21, 12, 81),
+(251, 21, 13, 80),
+(252, 21, 14, 79),
+
+(253, 22, 1, 85),
+(254, 22, 2, 87),
+(255, 22, 3, 89),
+(256, 22, 4, 90),
+(257, 22, 6, 91),
+(258, 22, 7, 92),
+(259, 22, 8, 93),
+(260, 22, 9, 94),
+(261, 22, 11, 95),
+(262, 22, 12, 96),
+(263, 22, 13, 97),
+(264, 22, 14, 98),
+
+(265, 23, 1, 80),
+(266, 23, 2, 82),
+(267, 23, 3, 84),
+(268, 23, 4, 86),
+(269, 23, 6, 88),
+(270, 23, 7, 90),
+(271, 23, 8, 89),
+(272, 23, 9, 87),
+(273, 23, 11, 85),
+(274, 23, 12, 83),
+(275, 23, 13, 82),
+(276, 23, 14, 81),
+
+(277, 24, 1, 88),
+(278, 24, 2, 87),
+(279, 24, 3, 86),
+(280, 24, 4, 85),
+(281, 24, 6, 84),
+(282, 24, 7, 83),
+(283, 24, 8, 82),
+(284, 24, 9, 81),
+(285, 24, 11, 80),
+(286, 24, 12, 79),
+(287, 24, 13, 78),
+(288, 24, 14, 77),
+
+(289, 25, 1, 85),
+(290, 25, 2, 87),
+(291, 25, 3, 89),
+(292, 25, 4, 90),
+(293, 25, 6, 92),
+(294, 25, 7, 91),
+(295, 25, 8, 89),
+(296, 25, 9, 87),
+(297, 25, 11, 85),
+(298, 25, 12, 84),
+(299, 25, 13, 83),
+(300, 25, 14, 82);
+
+
+
+
+
+-- Write a SELECT query to list all courses.
+
+SELECT [CourseId]
+      ,[CourseName]
+      ,[TeacherId]
+      ,[StartDate]
+      ,[EndDate]
+      ,[SyllabusId]
+  FROM [dbo].[Courses]
+
+GO
+
+--Write a SELECT query to find all assignments for a specific course.
+
+SELECT [AssignmentId]
+      ,[CourseId]
+      ,[AssignmentTitle]
+      ,[Description]
+      ,[Weight]
+      ,[MaxGrade]
+      ,[DueDate]
+  FROM [dbo].[Assignments]
+  WHERE CourseId  = 2
+
+GO
+
+--Write a SELECT query to find all students (users with the role 'Student').
+
+SELECT [UserId]
+      ,[UserName]
+      ,[FirstName]
+      ,[LastName]
+      ,[EmailAddress]
+      ,[PhoneNumber]
+      ,[Role]
+  FROM [dbo].[Users]
+  WHERE Role = 'Student'
+
+GO
+
+--Write an UPDATE statement to change a student's role.
+
+UPDATE [dbo].[Users]
+   SET [Role] = 'Teacher'
+ WHERE UserName = 'MohammadRamez'
+GO
+
+--Write a DELETE statement to remove a specific comment.
+
+DELETE FROM [dbo].[Comments]
+      WHERE CommentId = 4
+GO
+
+
+--Write a query to list all students along with their grades for a specific course.
+
+Select a.AssignmentTitle, u.UserName, g.Grade from Assignments a
+inner join grades g on  a.AssignmentId = g.AssignmentId
+inner join Users u on u.UserId = g.StudentId
+where CourseId = 2 order by a.AssignmentTitle
+
+
+
+--Write a query to calculate the average grade for each course.
+
+
+Select c.CourseName, AVG(g.grade) as AvgGrade  from Assignments a
+inner join grades g on  a.AssignmentId = g.AssignmentId
+inner join Courses c on c.CourseId =a.CourseId
+group by c.CourseName 
+
+--Write a query to list all courses with their respective syllabuses.
+
+Select c.CourseName, s.Description from Courses c
+inner join Syllabus s on s.SyllabusId = c.SyllabusId 
+
+--Write a query to find all comments for a specific course.
+
+Select c.CourseName , com.CommentContent  from Assignments a
+inner join Comments com on com.AssignmentId = a.AssignmentId
+inner join Courses c on c.CourseId =a.CourseId
+where c.CourseId =2
+
+
+--Create a stored procedure to add a new student.
+
+
+CREATE PROCEDURE SP_InsertStudents
+    @UserId INT,
+    @UserName VARCHAR(256),
+    @FirstName VARCHAR(256),
+    @LastName VARCHAR(256),
+    @EmailAddress VARCHAR(256),
+    @PhoneNumber INT,
+    @Role VARCHAR(16)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    INSERT INTO Users
+        ([UserId], [UserName], [FirstName], [LastName], [EmailAddress], [PhoneNumber], [Role])
+    VALUES
+        (
+            @UserId,
+            @UserName,
+            @FirstName,
+            @LastName, 
+            @EmailAddress,
+            @PhoneNumber,
+            @Role
+        );
+END;
+
+
+--Create a stored procedure to add a new Assignment. Make sure the course assignments weights don’t go above 100.
+
+CREATE PROCEDURE SP_Assignments
+    @AssignmentId INT,
+    @CourseId INT,
+    @AssignmentTitle VARCHAR(256),
+    @Description TEXT,
+    @Weight INT,
+    @MaxGrade INT,
+    @DueDate DATETIME
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN 
+    IF @Weight > 100
+    BEGIN
+        RAISERROR('Weight must not exceed 100.', 16, 1);
+        RETURN;
+    END
+
+    INSERT INTO Assignments (AssignmentId, CourseId, AssignmentTitle, Description, Weight, MaxGrade, DueDate)
+VALUES
+        (
+            @AssignmentId,
+            @CourseId,
+            @AssignmentTitle,
+            @Description, 
+            @Weight,
+            @MaxGrade,
+            @DueDate
+        );
+END;
+
+
+--Calculate function to calculate the Student Grade in a Course. Return ‘A', 'B’, etc…
+
+CREATE FUNCTION dbo.CalculateStudentGradeInCourse
+(
+    @StudentId INT,
+    @CourseId INT
+)
+RETURNS CHAR(3)  
+AS
+BEGIN
+    DECLARE @AvgGrade FLOAT;
+    DECLARE @LetterGrade CHAR(3);
+
+    SELECT @AvgGrade = AVG(CAST(g.Grade AS FLOAT))
+    FROM Grades g
+    INNER JOIN Assignments a ON g.AssignmentId = a.AssignmentId
+    WHERE g.StudentId = @StudentId AND a.CourseId = @CourseId;
+
+    IF @AvgGrade IS NULL
+        RETURN 'N/A';
+
+    SET @LetterGrade =
+        CASE 
+            WHEN @AvgGrade >= 93 THEN 'A'
+            WHEN @AvgGrade >= 90 THEN 'A-'
+            WHEN @AvgGrade >= 87 THEN 'B+'
+            WHEN @AvgGrade >= 83 THEN 'B'
+            WHEN @AvgGrade >= 80 THEN 'B-'
+            WHEN @AvgGrade >= 77 THEN 'C+'
+            WHEN @AvgGrade >= 73 THEN 'C'
+            WHEN @AvgGrade >= 70 THEN 'C-'
+            WHEN @AvgGrade >= 67 THEN 'D+'
+            WHEN @AvgGrade >= 65 THEN 'D'
+            ELSE 'F'
+        END;
+
+    RETURN @LetterGrade;
+END
+GO
+
+
+
+
+--Create a function to calculate the GPA of a student.
+
+CREATE FUNCTION dbo.ConvertGradeToGPA (@Grade INT)
+RETURNS DECIMAL(3,2)
+AS
+BEGIN
+    RETURN
+        CASE 
+            WHEN @Grade >= 93 THEN 4.0
+            WHEN @Grade >= 90 THEN 3.7
+            WHEN @Grade >= 87 THEN 3.3
+            WHEN @Grade >= 83 THEN 3.0
+            WHEN @Grade >= 80 THEN 2.7
+            WHEN @Grade >= 77 THEN 2.3
+            WHEN @Grade >= 73 THEN 2.0
+            WHEN @Grade >= 70 THEN 1.7
+            WHEN @Grade >= 67 THEN 1.3
+            WHEN @Grade >= 65 THEN 1.0
+            ELSE 0.0
+        END
+END
+GO
+
+
+
+CREATE FUNCTION dbo.CalculateStudentGPA (@StudentId INT)
+RETURNS DECIMAL(3,2)
+AS
+BEGIN
+    DECLARE @GPA DECIMAL(3,2);
+
+    SELECT @GPA = AVG(dbo.ConvertGradeToGPA(Grade))
+    FROM Grades
+    WHERE StudentId = @StudentId;
+
+    RETURN @GPA;
+END
+GO
+
+
+SELECT dbo.CalculateStudentGPA(10) AS GPA;
+
